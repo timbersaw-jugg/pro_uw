@@ -401,7 +401,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  app.listen(PORT, "[IP_ADDRESS]", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
