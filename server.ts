@@ -85,7 +85,7 @@ if (!admin) {
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;;
+  const PORT = 3000;
 
   app.use(helmet({
     contentSecurityPolicy: false, // Disable CSP for development/iframe compatibility
@@ -392,16 +392,37 @@ async function startServer() {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
+      root: __dirname,
     });
     app.use(vite.middlewares);
-  } else {
-    app.use(express.static(path.join(__dirname, "dist")));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist", "index.html"));
+
+    // SPA fallback for development
+    app.use("*", async (req, res, next) => {
+      const url = req.originalUrl;
+      try {
+        let template = fs.readFileSync(path.resolve(__dirname, "index.html"), "utf-8");
+        template = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ "Content-Type": "text/html" }).end(template);
+      } catch (e) {
+        vite.ssrFixStacktrace(e as Error);
+        next(e);
+      }
     });
+  } else {
+    const distPath = path.join(__dirname, "dist");
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+      app.get("*", (req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+    } else {
+      app.get("*", (req, res) => {
+        res.status(404).send("Production build (dist) not found. Please run npm run build.");
+      });
+    }
   }
 
-  app.listen(PORT, "[IP_ADDRESS]", () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
