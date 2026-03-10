@@ -85,7 +85,7 @@ if (!admin) {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000;;
 
   app.use(helmet({
     contentSecurityPolicy: false, // Disable CSP for development/iframe compatibility
@@ -267,7 +267,7 @@ async function startServer() {
     let totalExpScore = 0;
 
     const updateResponse = db.prepare("UPDATE responses SET admin_score = ?, admin_explanation_score = ? WHERE id = ?");
-    
+
     responses.forEach((r: any) => {
       updateResponse.run(r.admin_score, r.admin_explanation_score, r.id);
       totalScore += (r.admin_score || 0);
