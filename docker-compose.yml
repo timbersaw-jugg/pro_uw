@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    image: prouw-app
+    container_name: prouw-container
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - LLAMA_API_KEY=${LLAMA_API_KEY}
+      - LLAMA_BASE_URL=${LLAMA_BASE_URL}
+    volumes:
+      - ./prouw.db:/app/prouw.db
+    restart: always

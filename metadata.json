@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Pro UW",
+  "description": "A production-ready, secure testing tool for Mortgage Underwriters with AI proctoring, automated scoring, and Docker containerization.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
